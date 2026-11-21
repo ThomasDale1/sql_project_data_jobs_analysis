@@ -1,27 +1,23 @@
-WITH remote_job_skills AS (
-    SELECT
-        skill_id,
-        COUNT(*) AS skill_count
-    FROM
-        skills_job_dim AS skills_to_job
-    INNER JOIN
-        job_postings_fact AS job_postings
-    ON
-        job_postings.job_id = skills_to_job.job_id
-    WHERE
-        job_work_from_home = true
-        AND job_title_short = 'Data Analyst'
-    GROUP BY
-        skill_id
-)
+/*
+Question: What are the most in-demand skills
+- Join job postings to inner join table similar to query 2
+- Identify the top 5 most frequently listed skills.
+- Focus on all job postings.
+- Why? Highlighting the most in-demand skills can help job seekers focus on developing the skills that are most valued by employers.
+*/
+
 SELECT
-    remote_job_skills.skill_id,
-    skills.skills,
-    remote_job_skills.skill_count
+    skills,
+    COUNT(skills_job_dim.job_id) AS skill_count
 FROM
-    remote_job_skills
+    job_postings_fact
 INNER JOIN
-    skills_dim AS skills ON skills.skill_id = remote_job_skills.skill_id
+    skills_job_dim ON job_postings_fact.job_id = skills_job_dim.job_id
+INNER JOIN
+    skills_dim ON skills_job_dim.skill_id = skills_dim.skill_id
+GROUP BY
+    skills
 ORDER BY
-    remote_job_skills.skill_count DESC
-LIMIT 5;
+    skill_count DESC
+LIMIT
+    5;
